@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AmpTown</string>
+    <string name="amptown">AmpTown</string>
+    <string name="new_game">New Game</string>
+    <string name="load_game">Load Game</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
+    <string name="todo">TODO</string>
 </resources>
