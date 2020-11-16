@@ -23,26 +23,23 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
 
     private int width;
     private int height;
-
     public fightLoop fightLoop;
     private Hero hero;
     private accelerometerControls accelerometerControls;
     private LinkedList<Projectile> projectiles = new LinkedList<>();
     private Projectile tempProjectile;
-
     private long projectileCooldownInMS = 1200;
     private long projectileCooldownLeft = projectileCooldownInMS;
     private CountDownTimer projectileCooldown;
     private int fightTimeLeft = 60;
-
     private int DPS = 1;
     private int damageClick = 5;
     private int MaxHP = 500;
     private int HP = MaxHP;
-
     private Context context;
-
     private long frameTime;
+    private boolean paused = false;
+
 
     TextView timeText;
     TextView hpText;
@@ -63,8 +60,7 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         init(context);
     }
 
-    public void setHP(int MaxHP)
-    {
+    public void setHP(int MaxHP) {
         this.MaxHP = MaxHP;
         HP = MaxHP;
     }
@@ -76,9 +72,10 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         fightLoop = new fightLoop(this, surfaceHolder);
         accelerometerControls = new accelerometerControls(context);
         setFocusable(true);
-        frameTime = System.currentTimeMillis();;
+        frameTime = System.currentTimeMillis();
+        ;
 
-        projectileCooldown = new CountDownTimer(projectileCooldownLeft,1000) {
+        projectileCooldown = new CountDownTimer(projectileCooldownLeft, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 projectileCooldownLeft = millisUntilFinished;
@@ -87,7 +84,7 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
             @Override
             public void onFinish() {
 
-                tempProjectile = new Projectile(context,width);
+                tempProjectile = new Projectile(context, width);
                 projectiles.add(tempProjectile);
                 projectileCooldownLeft = projectileCooldownInMS;
                 projectileCooldown.start();
@@ -96,44 +93,38 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         setZOrderOnTop(true);
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         fightTimerInit();
-
+        resume();
     }
 
-    private void dealDMG(float DMG)
-    {
+    private void dealDMG(float DMG) {
         HP -= DMG;
-        if(HP < 0)
-        {
+        if (HP < 0) {
             fightTimeLeft = 0;
             fightLoop.stopLoop();
             hpText.setText("0 / " + MaxHP);
-        }
-        else
-        {
-            hpText.setText( HP +" / " + MaxHP);
+        } else {
+            hpText.setText(HP + " / " + MaxHP);
         }
 
     }
 
-    private void fightTimerInit()
-    {
+    private void fightTimerInit() {
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if(fightTimeLeft > 0)
-                {
-                    fightTimeLeft--;
-                    timeText.setText(String.valueOf(fightTimeLeft));
-                    dealDMG(DPS);
-                    handler.postDelayed(this, 1000);
-                }
-                else
-                {
-                    if(HP>0) {
-                        timeText.setText(String.valueOf(0));
+                if (!paused) {
+                    if (fightTimeLeft > 0) {
+                        fightTimeLeft--;
+                        timeText.setText(String.valueOf(fightTimeLeft));
+                        dealDMG(DPS);
+                        handler.postDelayed(this, 1000);
+                    } else {
+                        if (HP > 0) {
+                            timeText.setText(String.valueOf(0));
+                        }
+                        fightLoop.stopLoop();
                     }
-                    fightLoop.stopLoop();
                 }
             }
         });
@@ -152,8 +143,7 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
 
         hero.draw(canvas);
 
-        for(int i = 0; i<projectiles.size(); i++)
-        {
+        for (int i = 0; i < projectiles.size(); i++) {
             tempProjectile = projectiles.get(i);
             tempProjectile.draw(canvas);
         }
@@ -164,9 +154,9 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         this.width = w;
         this.height = h;
-        timeText = (TextView) ((Activity) context).findViewById(R.id.time_left);
-        hpText = (TextView) ((Activity) context).findViewById(R.id.text_hp);
-        crossedSwords = (ImageButton) ((Activity) context).findViewById(R.id.crossed_swords);
+        timeText = ((Activity) context).findViewById(R.id.time_left);
+        hpText = ((Activity) context).findViewById(R.id.text_hp);
+        crossedSwords = ((Activity) context).findViewById(R.id.crossed_swords);
         crossedSwords.setOnClickListener(this);
 
         super.onSizeChanged(w, h, oldw, oldh);
@@ -174,6 +164,10 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        if(fightLoop.getState().equals(Thread.State.TERMINATED))
+        {
+            fightLoop = new fightLoop(this,holder);
+        }
         fightLoop.startLoop();
     }
 
@@ -202,18 +196,14 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         if (Math.abs(xSpeed * elapsedTime) > 5) {
             int lastpostX = hero.positionX;
 
-            hero.positionX +=xSpeed*elapsedTime;
-            hero.heroRunning=true;
-            if((lastpostX-hero.positionX)<0)
-            {
-                if(hero.turnedLeft){
+            hero.positionX += xSpeed * elapsedTime;
+            hero.heroRunning = true;
+            if ((lastpostX - hero.positionX) < 0) {
+                if (hero.turnedLeft) {
                     hero.turnedLeft = false;
                 }
-            }
-            else
-            {
-                if(!hero.turnedLeft)
-                {
+            } else {
+                if (!hero.turnedLeft) {
                     hero.turnedLeft = true;
                 }
             }
@@ -228,26 +218,22 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         }
 
 
-        for(int i = 0; i<projectiles.size(); i++)
-        {
+        for (int i = 0; i < projectiles.size(); i++) {
             tempProjectile = projectiles.get(i);
             tempProjectile.move();
 
-            if(tempProjectile.checkHit(hero))
-            {
+            if (tempProjectile.checkHit(hero)) {
                 removeProjectile(i);
-               fightTimeLeft -= 5;
+                fightTimeLeft -= 5;
             }
 
-            if(tempProjectile.positionY > height)
-            {
-               removeProjectile(i);
+            if (tempProjectile.positionY > height) {
+                removeProjectile(i);
             }
         }
     }
 
-    void removeProjectile(int id)
-    {
+    void removeProjectile(int id) {
         projectiles.remove(id);
     }
 
@@ -257,5 +243,19 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
             dealDMG(damageClick);
         }
 
+    }
+
+    public void resume() {
+        if(paused) {
+            paused = false;
+            fightTimerInit();
+            projectileCooldown.start();
+        }
+    }
+
+    public void pause() {
+        paused = true;
+        projectileCooldown.cancel();
+        fightLoop.stopLoop();
     }
 }
