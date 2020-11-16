@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/game_nav"
+    app:startDestination="@id/town">
+
+    <fragment
+        android:id="@+id/forest"
+        android:name="com.example.amptown.forest"
+        android:label="fragment_forest"
+        tools:layout="@layout/fragment_forest" />
+    <fragment
+        android:id="@+id/town"
+        android:name="com.example.amptown.town"
+        android:label="fragment_town"
+        tools:layout="@layout/fragment_town" />
+    <fragment
+        android:id="@+id/mine"
+        android:name="com.example.amptown.mine"
+        android:label="fragment_mine"
+        tools:layout="@layout/fragment_mine" />
+    <fragment
+        android:id="@+id/map"
+        android:name="com.example.amptown.map"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" />
+
+</navigation>

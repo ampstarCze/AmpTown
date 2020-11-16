@@ -9,13 +9,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity
+            android:name=".game_battle"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".game_main"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
         <service
             android:name=".MusicPlayer"
-            android:enabled="true" />
+            android:configChanges="orientation"
+            android:enabled="true"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".Settings"></activity>
-        <activity android:name=".MainMenu">
+        <activity
+            android:name=".Settings"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainMenu"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

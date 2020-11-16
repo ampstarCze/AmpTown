@@ -95,9 +95,15 @@ public class MainMenu extends AppCompatActivity {
     }
 
     public void mainMenuLoadGame(View view) {
+        Intent loadGame = new Intent(getApplicationContext(), game_battle.class);
+        startActivity(loadGame);
+        finish();
     }
 
     public void mainMenuNewGame(View view) {
+        Intent newGame = new Intent(getApplicationContext(), game_main.class);
+        startActivity(newGame);
+        finish();
     }
 
     private ServiceConnection Scon =new ServiceConnection(){
