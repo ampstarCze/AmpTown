@@ -29,7 +29,7 @@ public class Projectile {
     {
         Random random = new Random();
         positionX = random.nextInt(width) + 1;
-        positionY = -60;
+        positionY = 0;
 
         arrowImage = BitmapFactory.decodeResource(context.getResources(),R.drawable.arrow);
         arrowImage = Bitmap.createScaledBitmap(arrowImage, 30, 180, false);

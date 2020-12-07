@@ -106,14 +106,28 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="414dp"
+        android:layout_height="20dp"
+        android:adjustViewBounds="true"
+        android:scaleType="center"
+        app:layout_constraintBottom_toBottomOf="@+id/fight_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.315"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.44"
+        app:srcCompat="@drawable/platform" />
+
+    <ImageView
         android:id="@+id/enemy_image"
         android:layout_width="157dp"
         android:layout_height="71dp"
-        app:layout_constraintBottom_toTopOf="@+id/fight_container"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_hp"
-        app:layout_constraintVertical_bias="0.993"
+        app:layout_constraintVertical_bias="0.95"
         app:srcCompat="@drawable/enemy1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
