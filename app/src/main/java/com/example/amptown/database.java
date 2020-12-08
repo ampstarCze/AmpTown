@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -19,7 +21,7 @@ public class database extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE save (id INTEGER, saveTime NUMERIC, day INTEGER, hour INTEGER, minute INTEGER, wood INTEGER, stone INTEGER, gold INTEGER, woodcutterCount INTEGER, axeLVL INTEGER, " +
+        db.execSQL("CREATE TABLE save (id INTEGER, saveTime NUMERIC, day INTEGER, hour INTEGER, minute INTEGER, wood INTEGER, stone INTEGER, dayTimeLeft INTEGER, gold INTEGER, woodcutterCount INTEGER, axeLVL INTEGER, " +
                 "stonecutterCount INTEGER, pickaxeLVL INTEGER, marketplaceLVL INTEGER, woodBuy INTEGER, woodSell INTEGER, stoneBuy INTEGER, stoneSell INTEGER, barracksLVL INTEGER, soldiersCount INTEGER," +
                 " swordLVL INTEGER, soldiersDPS INTEGER, dungMax INTEGER, banditSpawned INTEGER, banditNext INTEGER, banditWood INTEGER, banditStone INTEGER, banditGold INTEGER)");
     }
@@ -33,6 +35,7 @@ public class database extends SQLiteOpenHelper {
     public void newSave(Integer ID)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+       // db.execSQL("DROP TABLE save");
         db.delete("save","id=?",new String[] {String.valueOf(ID)});
 
         ContentValues contentValues = new ContentValues();
@@ -44,6 +47,7 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("wood", 0);
         contentValues.put("stone", 0);
         contentValues.put("gold", 0);
+        contentValues.put("dayTimeLeft", 600000);
         contentValues.put("woodcutterCount", 0);
         contentValues.put("axeLVL", 0);
         contentValues.put("stonecutterCount", 0);
@@ -67,7 +71,7 @@ public class database extends SQLiteOpenHelper {
         db.insert("save", null, contentValues);
 
         db.execSQL("DROP TABLE IF EXISTS price"+ID);
-        db.execSQL("CREATE TABLE price "+ ID +"(name TEXT, wood TEXT, stone TEXT, gold TEXT)");
+        db.execSQL("CREATE TABLE price"+ ID +" (name TEXT, wood TEXT, stone TEXT, gold TEXT)");
 
         initPrice(ID);
     }
@@ -167,11 +171,11 @@ public class database extends SQLiteOpenHelper {
         return dateFormat.format(date);
     }
 
-    public void update(Integer ID, String item, String value)
+    public void update(Integer ID, String item, long value)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(item, String.valueOf(value));
+        contentValues.put(item, value);
         contentValues.put("saveTime",getDateTime());
         db.update("save",contentValues,"id=?",new String[] {String.valueOf(ID)});
     }
