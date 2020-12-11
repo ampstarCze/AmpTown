@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 public class mine extends Fragment implements View.OnClickListener  {
 
-    int hammerClicked = 0;
     ImageView pickAxeButton;
     ImageView vagonButton;
 
@@ -58,13 +57,15 @@ public class mine extends Fragment implements View.OnClickListener  {
     public void onClick(View v) {
         if (v.getId() == R.id.pickaxe) {
             if (!game_main.stoneBuilded) {
-                if (hammerClicked < 2) {
-                    hammerClicked++;
+                if (game_main.stoneHammerClick < 2) {
+                    game_main.stoneHammerClick++;
+
                 } else {
-                    hammerClicked = 0;
+                    game_main.stoneHammerClick = 0;
                     pickAxeButton.setImageResource(R.drawable.pick_axe);
                     game_main.stoneBuilded = true;
                 }
+                game_main.db.update(game_main.ID,"woodHammerClick", game_main.woodHammerClick);
             }
             else
             {

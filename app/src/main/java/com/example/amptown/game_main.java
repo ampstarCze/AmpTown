@@ -27,12 +27,12 @@ public class game_main extends FragmentActivity {
     private SharedPreferences preferences;
     private SharedPreferences.Editor preferencesEditor;
 
-   public static Fragment currentFragment;
+    public static Fragment currentFragment;
 
     private long dayTime = 600000;
     private long dayTimeLeft = dayTime;
     private CountDownTimer dayTimer;
-    private static database db;
+    public static database db;
 
     public MusicPlayer mServ;
     private boolean mIsBound = false;
@@ -53,21 +53,23 @@ public class game_main extends FragmentActivity {
     public static int ID;
     private boolean loadGame;
 
-    public static int woodStorege =0;
+    public static int woodStorege = 0;
     public static int woodStoregeMax = 200;
-    public static int wood =0;
-    public static int gold =0;
-    public static int stoneStorage =0;
+    public static int wood = 0;
+    public static int gold = 0;
+    public static int stoneStorage = 0;
     public static int stoneStoregeMax = 200;
-    public static int stone =0;
+    public static int stone = 0;
     public static int woodClickGen = 1;
     public static int stoneCLickGen = 1;
 
-    private int woodGenRate = 0;
-    private int stoneGenRate = 0;
+    private int woodGenRate = 3;
+    private int stoneGenRate = 3;
 
     static boolean stoneBuilded = false;
     static boolean woodBuilded = false;
+    public static int woodHammerClick = 3;
+    public static int stoneHammerClick = 3;
 
     static long woodTransportLeftStart = 20000;
     static long stoneTransportLeftStart = 20000;
@@ -81,17 +83,20 @@ public class game_main extends FragmentActivity {
     static int dungMaxLvl = 1;
     public static int banditSpawned = 0;
     public static int banditNext = 3;
+    public static int banditWood = 0;
+    public static int banditStone = 0;
+    public static int banditGold = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_main);
 
-        BottomNavigationView bottomNavigation =  findViewById(R.id.gameBotomMemu);
+        BottomNavigationView bottomNavigation = findViewById(R.id.gameBotomMemu);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
         bottomNavigation.setSelectedItemId(R.id.town);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment,new town()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, new town()).commit();
 
         minuteView = findViewById(R.id.minute);
         hourView = findViewById(R.id.hour);
@@ -104,9 +109,9 @@ public class game_main extends FragmentActivity {
         preferences = getSharedPreferences("AmpTown", Context.MODE_PRIVATE);
         preferencesEditor = preferences.edit();
 
-         ID = preferences.getInt("slotID",1);
-         loadGame = preferences.getBoolean("loadGame",false);
-         db = new database(this);
+        ID = preferences.getInt("slotID", 1);
+        loadGame = preferences.getBoolean("loadGame", false);
+        db = new database(this);
 
         doBindService();
         Intent music = new Intent();
@@ -121,6 +126,7 @@ public class game_main extends FragmentActivity {
                     mServ.pauseMusic();
                 }
             }
+
             @Override
             public void onHomeLongPressed() {
                 if (mServ != null) {
@@ -130,12 +136,9 @@ public class game_main extends FragmentActivity {
         });
         homeWatcher.startWatch();
 
-        if(!loadGame)
-        {
+        if (!loadGame) {
             db.newSave(ID);
-        }
-        else
-        {
+        } else {
             loadGame();
         }
 
@@ -143,37 +146,35 @@ public class game_main extends FragmentActivity {
             @Override
             public void onTick(long millisUntilFinished) {
                 dayTimeLeft = millisUntilFinished;
-                minute+=10;
+                minute += 10;
 
                 generatResources();
                 updateText();
 
-                if(minute>=60)
-                {
-                    minute=0;
+                if (minute >= 60) {
+                    minute = 0;
                     hour++;
                 }
-                db.update(ID,"minute",minute);
-                db.update(ID,"dayTimeLeft", dayTimeLeft);
-                minuteView.setText("Minute: "+ minute);
-                if(hour>=24)
-                {
+                db.update(ID, "minute", minute);
+                db.update(ID, "dayTimeLeft", dayTimeLeft);
+                minuteView.setText("Minute: " + minute);
+                if (hour >= 24) {
                     hour = 0;
                     day++;
                 }
-                db.update(ID,"hour",hour);
-                db.update(ID,"day",day);
-                hourView.setText("Hour: "+ hour);
-                dayView.setText("Day: "+ day);
+                db.update(ID, "hour", hour);
+                db.update(ID, "day", day);
+                hourView.setText("Hour: " + hour);
+                dayView.setText("Day: " + day);
             }
 
             @Override
             public void onFinish() {
-                if(day >= banditNext)
-                {
+                if (day >= banditNext) {
                     banditSpawned = 1;
-                    db.update(ID,"banditSpawned",banditSpawned);
-                    //TODO raid
+                    db.update(ID, "banditSpawned", banditSpawned);
+                    banditRaid();
+                    damageGen();
                 }
                 dayTimeLeft = dayTime;
                 dayTimer.start();
@@ -185,8 +186,7 @@ public class game_main extends FragmentActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
-            switch (item.getItemId())
-            {
+            switch (item.getItemId()) {
                 case R.id.map:
                     selectedFragment = new map();
                     break;
@@ -214,12 +214,11 @@ public class game_main extends FragmentActivity {
         minute = cursor.getInt(cursor.getColumnIndex("minute"));
         dayTimeLeft = cursor.getInt(cursor.getColumnIndex("dayTimeLeft"));
 
-        minuteView.setText("Minute: "+ minute);
-        hourView.setText("Hour: "+ hour);
-        dayView.setText("Day: "+ day);
+        minuteView.setText("Minute: " + minute);
+        hourView.setText("Hour: " + hour);
+        dayView.setText("Day: " + day);
 
-        if(!cursor.isClosed())
-        {
+        if (!cursor.isClosed()) {
             cursor.close();
         }
     }
@@ -228,7 +227,7 @@ public class game_main extends FragmentActivity {
     public void onBackPressed() {
 
         if (currentFragment instanceof map) {
-            if(map.dungList.getVisibility() == View.VISIBLE) {
+            if (map.dungList.getVisibility() == View.VISIBLE) {
                 map.dungList.setVisibility(View.GONE);
                 return;
             }
@@ -263,11 +262,11 @@ public class game_main extends FragmentActivity {
         }
     }
 
-    private ServiceConnection Scon =new ServiceConnection(){
+    private ServiceConnection Scon = new ServiceConnection() {
 
         public void onServiceConnected(ComponentName name, IBinder
                 binder) {
-            mServ = ((MusicPlayer.ServiceBinder)binder).getService();
+            mServ = ((MusicPlayer.ServiceBinder) binder).getService();
         }
 
         public void onServiceDisconnected(ComponentName name) {
@@ -280,91 +279,83 @@ public class game_main extends FragmentActivity {
         super.onDestroy();
         doUnbindService();
         Intent music = new Intent();
-        music.setClass(this,MusicPlayer.class);
+        music.setClass(this, MusicPlayer.class);
         homeWatcher.stopWatch();
         stopService(music);
     }
 
-    void doBindService(){
-        bindService(new Intent(this,MusicPlayer.class),
+    void doBindService() {
+        bindService(new Intent(this, MusicPlayer.class),
                 Scon, Context.BIND_AUTO_CREATE);
         mIsBound = true;
     }
 
-    void doUnbindService()
-    {
-        if(mIsBound)
-        {
+    void doUnbindService() {
+        if (mIsBound) {
             unbindService(Scon);
             mIsBound = false;
         }
     }
 
-    static void updateText()
-    {
+    static void updateText() {
         if (currentFragment instanceof forest) {
-            frameTextL.setText("Storaged wood: " + woodStorege + " / "+ woodStoregeMax);
+            frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStoregeMax);
         }
 
         if (currentFragment instanceof mine) {
-            frameTextL.setText("Storaged stone: " + stoneStorage + " / "+ stoneStoregeMax);
+            frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
         }
     }
 
-    void generatResources()
-    {
-        woodStorege += woodGenRate;
-        if(woodStorege > woodStoregeMax)
-        {
-            woodStorege = woodStoregeMax;
+    void generatResources() {
+        if(woodBuilded) {
+            woodStorege += woodGenRate;
+            if (woodStorege > woodStoregeMax) {
+                woodStorege = woodStoregeMax;
+            }
         }
-
-        stoneStorage += stoneGenRate;
-        if(stoneStorage > stoneStoregeMax)
-        {
-            stoneStorage = stoneStoregeMax;
+        if(stoneBuilded) {
+            stoneStorage += stoneGenRate;
+            if (stoneStorage > stoneStoregeMax) {
+                stoneStorage = stoneStoregeMax;
+            }
         }
-        db.updateStoraged(ID,woodStorege,stoneStorage);
+        db.updateStoraged(ID, woodStorege, stoneStorage);
     }
 
-    public static void genClick()
-    {
+    public static void genClick() {
         if (currentFragment instanceof forest) {
             woodStorege += woodClickGen;
-            if(woodStorege > woodStoregeMax)
-            {
+            if (woodStorege > woodStoregeMax) {
                 woodStorege = woodStoregeMax;
             }
         }
 
         if (currentFragment instanceof mine) {
             stoneStorage += stoneCLickGen;
-            if(woodStorege > woodStoregeMax)
-            {
+            if (woodStorege > woodStoregeMax) {
                 woodStorege = woodStoregeMax;
             }
         }
         updateText();
     }
 
-    public static void initWoodTransport()
-    {
-        if(!woodTransportProgress)
-        {
+    public static void initWoodTransport() {
+        if (!woodTransportProgress) {
             woodTransportProgress = true;
             forest.forestTransportText.setVisibility(View.VISIBLE);
-            woodTransportTimer = new CountDownTimer( woodTransportLeft, 1000) {
+            woodTransportTimer = new CountDownTimer(woodTransportLeft, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     woodTransportLeft = millisUntilFinished;
-                    forest.forestTransportText.setText(""+woodTransportLeft/1000);
+                    forest.forestTransportText.setText("" + woodTransportLeft / 1000);
                 }
 
                 @Override
                 public void onFinish() {
                     woodTransportLeft = woodTransportLeftStart;
                     forest.forestTransportText.setVisibility(View.GONE);
-                    if(isRaided()) {
+                    if (isRaided()) {
                         wood += woodStorege;
                         db.update(ID, "wood", wood);
                     }
@@ -384,24 +375,22 @@ public class game_main extends FragmentActivity {
         }
     }
 
-    public static void initStoneTransport()
-    {
-        if(!stoneTransportPrograss)
-        {
+    public static void initStoneTransport() {
+        if (!stoneTransportPrograss) {
             stoneTransportPrograss = true;
             mine.mineTransportText.setVisibility(View.VISIBLE);
-            stoneTransportTimer = new CountDownTimer( stoneTransportLeft, 1000) {
+            stoneTransportTimer = new CountDownTimer(stoneTransportLeft, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     stoneTransportLeft = millisUntilFinished;
-                    mine.mineTransportText.setText(""+stoneTransportLeft/1000);
+                    mine.mineTransportText.setText("" + stoneTransportLeft / 1000);
                 }
 
                 @Override
                 public void onFinish() {
                     stoneTransportLeft = stoneTransportLeftStart;
                     mine.mineTransportText.setVisibility(View.GONE);
-                    if(isRaided()) {
+                    if (isRaided()) {
                         stone += stoneStorage;
                         db.update(ID, "stone", stone);
                     }
@@ -421,17 +410,68 @@ public class game_main extends FragmentActivity {
         }
     }
 
-    private static boolean isRaided()
-    {
+    private static boolean isRaided() {
         final int random = new Random().nextInt((10 - 1) + 1) + 1;
-        if(random == 1)
-        {
+        if (random == 1) {
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
 
+    private void banditRaid() {
+        if (banditSpawned == 1) {
+
+            final int random = new Random().nextInt((10 - 1) + 1) + 1;
+
+            int looted;
+            looted = (int) (wood * 0.25);
+            wood -= looted;
+            banditWood += looted;
+            if (wood < 0) {
+                wood = 0;
+            }
+
+            looted = (int) (stone * 0.25);
+            stone -= looted;
+            banditStone += looted;
+            if (stone < 0) {
+                stone = 0;
+            }
+
+            looted = (int) (gold * 0.25);
+            gold -= looted;
+            banditGold += looted;
+            if (gold < 0) {
+                gold = 0;
+            }
+
+            if (currentFragment instanceof town) {
+                frameTextL.setText("Wood: " + wood);
+                frameTextM.setText("Stone: " + stone);
+                frameTextR.setText("Gold: " + gold);
+            }
+
+            db.updateResources(ID, wood, stone, gold);
+            db.update(ID,"banditWood" ,banditWood);
+            db.update(ID,"banditStone" ,banditStone);
+            db.update(ID,"banditGold" ,banditGold);
+
+
+        }
+    }
+
+    private void damageGen()
+    {
+        int random = new Random().nextInt((10 - 1) + 1) + 1;
+        if (random == 1) {
+            stoneHammerClick = 3;
+            stoneBuilded = false ;
+        }
+        random = new Random().nextInt((10 - 1) + 1) + 1;
+        if (random == 1) {
+            woodHammerClick = 3;
+            woodBuilded = false ;
+        }
+    }
 }

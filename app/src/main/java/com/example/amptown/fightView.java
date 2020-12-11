@@ -42,10 +42,6 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
     private boolean paused = false;
     private static database db;
 
-    private int banditWood;
-    private int banditStone;
-    private int banditGold;
-
     private fightView fightView;
 
     TextView timeText;
@@ -88,9 +84,6 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         if (game_battle.banditCamp) {
             MaxHP = 2000 + (500 * (game_main.day - 2));
             HP = MaxHP;
-            banditWood = cursor.getInt(cursor.getColumnIndex("banditWood"));
-            banditStone = cursor.getInt(cursor.getColumnIndex("banditStone"));
-            banditGold = cursor.getInt(cursor.getColumnIndex("banditGold"));
         } else {
             for (int i = 1; i < game_battle.DungLVL; i++) {
                 MaxHP *= 1.5;
@@ -141,9 +134,9 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
             fightView.setVisibility(GONE);
 
             if (game_battle.banditCamp) {
-                game_main.wood += banditWood + (banditWood * 0.2);
-                game_main.stone += banditStone + (banditStone * 0.2);
-                game_main.gold += banditGold + (banditGold * 0.2);
+                game_main.wood += game_main.banditWood + (game_main.banditWood * 0.2);
+                game_main.stone += game_main.banditStone + (game_main.banditStone * 0.2);
+                game_main.gold += game_main.banditGold + (game_main.banditGold * 0.2);
                 game_main.banditNext = game_main.day + 3;
                 game_main.banditSpawned = 0;
                 map.camp.setVisibility(GONE);

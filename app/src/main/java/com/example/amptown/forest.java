@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 public class forest extends Fragment implements View.OnClickListener {
 
-    int hammerClicked = 0;
     ImageButton axeButton;
     ImageView vagonButton;
 
@@ -61,13 +59,14 @@ public class forest extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.axe) {
             if (!game_main.woodBuilded) {
-                if (hammerClicked < 2) {
-                    hammerClicked++;
+                if (game_main.woodHammerClick < 2) {
+                    game_main.woodHammerClick++;
                 } else {
-                    hammerClicked = 0;
+                    game_main.woodHammerClick = 0;
                     axeButton.setImageResource(R.drawable.axe);
                     game_main.woodBuilded = true;
                 }
+                game_main.db.update(game_main.ID,"woodHammerClick", game_main.woodHammerClick);
             } else {
                 game_main.genClick();
             }
