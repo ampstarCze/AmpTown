@@ -2,6 +2,7 @@ package com.example.amptown;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -32,14 +33,20 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
     private long projectileCooldownLeft = projectileCooldownInMS;
     private CountDownTimer projectileCooldown;
     private int fightTimeLeft = 60;
-    private int DPS = 1;
-    private int damageClick = 5;
-    private int MaxHP = 500;
+    private int DPS = 0;
+    private int damageClick = 1;
+    private int MaxHP = 1500;
     private int HP = MaxHP;
     private Context context;
     private long frameTime;
     private boolean paused = false;
+    private static database db;
 
+    private int banditWood;
+    private int banditStone;
+    private int banditGold;
+
+    private fightView fightView;
 
     TextView timeText;
     TextView hpText;
@@ -60,20 +67,46 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         init(context);
     }
 
-    public void setHP(int MaxHP) {
-        this.MaxHP = MaxHP;
-        HP = MaxHP;
+    public void initText() {
+        timeText = ((Activity) context).findViewById(R.id.time_left);
+        hpText = ((Activity) context).findViewById(R.id.text_hp);
+        crossedSwords = ((Activity) context).findViewById(R.id.crossed_swords);
+        crossedSwords.setOnClickListener(this);
+        fightView = findViewById(R.id.fight_view);
     }
 
     void init(Context context) {
         SurfaceHolder surfaceHolder = getHolder();
         this.context = context;
         surfaceHolder.addCallback(this);
+
+        db = new database(this.context);
+
+        Cursor cursor = db.getData(game_main.ID);
+        cursor.moveToFirst();
+
+        if (game_battle.banditCamp) {
+            MaxHP = 2000 + (500 * (game_main.day - 2));
+            HP = MaxHP;
+            banditWood = cursor.getInt(cursor.getColumnIndex("banditWood"));
+            banditStone = cursor.getInt(cursor.getColumnIndex("banditStone"));
+            banditGold = cursor.getInt(cursor.getColumnIndex("banditGold"));
+        } else {
+            for (int i = 1; i < game_battle.DungLVL; i++) {
+                MaxHP *= 1.5;
+            }
+            HP = MaxHP;
+        }
+        DPS = cursor.getInt(cursor.getColumnIndex("soldiersDPS"));
+        int swordLVL = cursor.getInt(cursor.getColumnIndex("swordLVL"));
+        for (int i = 1; i <= swordLVL; i++) {
+            damageClick *= 2;
+        }
+
         fightLoop = new fightLoop(this, surfaceHolder);
         accelerometerControls = new accelerometerControls(context);
         setFocusable(true);
         frameTime = System.currentTimeMillis();
-        ;
 
         projectileCooldown = new CountDownTimer(projectileCooldownLeft, 1000) {
             @Override
@@ -98,10 +131,36 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
 
     private void dealDMG(float DMG) {
         HP -= DMG;
-        if (HP < 0) {
+        if (HP <= 0) {
             fightTimeLeft = 0;
             fightLoop.stopLoop();
+            paused = true;
             hpText.setText("0 / " + MaxHP);
+            game_battle.battleFinalCont.setVisibility(VISIBLE);
+            game_battle.battleResult.setText("You won!");
+            fightView.setVisibility(GONE);
+
+            if (game_battle.banditCamp) {
+                game_main.wood += banditWood + (banditWood * 0.2);
+                game_main.stone += banditStone + (banditStone * 0.2);
+                game_main.gold += banditGold + (banditGold * 0.2);
+                game_main.banditNext = game_main.day + 3;
+                game_main.banditSpawned = 0;
+                map.camp.setVisibility(GONE);
+                db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
+                db.update(game_main.ID, "banditWood", 0);
+                db.update(game_main.ID, "banditStone", 0);
+                db.update(game_main.ID, "banditGold", 0);
+                db.update(game_main.ID, "banditNext", game_main.day + 3);
+                db.update(game_main.ID, "banditSpawned", 0);
+            } else {
+                game_main.dungMaxLvl += 1;
+                game_main.wood += game_battle.DungLVL * 120;
+                game_main.stone += game_battle.DungLVL * 100;
+                game_main.gold += game_battle.DungLVL * 150;
+                db.update(game_main.ID, "dungMax", game_battle.DungLVL + 1);
+                db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
+            }
         } else {
             hpText.setText(HP + " / " + MaxHP);
         }
@@ -124,6 +183,9 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
                             timeText.setText(String.valueOf(0));
                         }
                         fightLoop.stopLoop();
+                        game_battle.battleFinalCont.setVisibility(VISIBLE);
+                        game_battle.battleResult.setText("You lose!");
+                        fightView.setVisibility(GONE);
                     }
                 }
             }
@@ -154,19 +216,14 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         this.width = w;
         this.height = h;
-        timeText = ((Activity) context).findViewById(R.id.time_left);
-        hpText = ((Activity) context).findViewById(R.id.text_hp);
-        crossedSwords = ((Activity) context).findViewById(R.id.crossed_swords);
-        crossedSwords.setOnClickListener(this);
 
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        if(fightLoop.getState().equals(Thread.State.TERMINATED))
-        {
-            fightLoop = new fightLoop(this,holder);
+        if (fightLoop.getState().equals(Thread.State.TERMINATED)) {
+            fightLoop = new fightLoop(this, holder);
         }
         fightLoop.startLoop();
     }
@@ -246,7 +303,7 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
     }
 
     public void resume() {
-        if(paused) {
+        if (paused) {
             paused = false;
             fightTimerInit();
             projectileCooldown.start();

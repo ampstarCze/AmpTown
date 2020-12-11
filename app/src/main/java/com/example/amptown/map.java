@@ -1,64 +1,94 @@
 package com.example.amptown;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link map#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class map extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class map extends Fragment implements View.OnClickListener {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public map() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment map.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static map newInstance(String param1, String param2) {
-        map fragment = new map();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    ImageView door;
+    public static ListView dungList;
+    public static ImageView camp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        game_main.currentFragment = getFragmentManager().findFragmentById(R.id.fragment);
+
+        game_main.frameTextL.setVisibility(View.GONE);
+        game_main.frameTextM.setVisibility(View.GONE);
+        game_main.frameTextR.setVisibility(View.GONE);
+
+        dungList = view.findViewById(R.id.dungList);
+        camp = view.findViewById(R.id.image_camp);
+        camp.setOnClickListener(this);
+
+        door = view.findViewById(R.id.image_door);
+        door.setOnClickListener(this);
+
+        if (game_main.banditSpawned == 0) {
+            camp.setVisibility(View.GONE);
+        } else {
+            camp.setVisibility(View.VISIBLE);
+        }
+        return view;
     }
+
+    public void showLevels() {
+        List<String> dungs = new ArrayList<>();
+
+        for (int i = 1; i <= game_main.dungMaxLvl; i++) {
+            dungs.add("Floor: " + i);
+        }
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, dungs);
+        dungList.setAdapter(arrayAdapter);
+        dungList.setVisibility(View.VISIBLE);
+        dungList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                dungList.setVisibility(View.GONE);
+                Intent dungBattle = new Intent(getActivity().getApplicationContext(), game_battle.class);
+                dungBattle.putExtra("dungLVL", i + 1);
+                startActivity(dungBattle);
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.image_door) {
+            showLevels();
+        }
+        if (v.getId() == R.id.image_camp) {
+            Intent dungBattle = new Intent(getActivity().getApplicationContext(), game_battle.class);
+            dungBattle.putExtra("dungLVL", 0);
+            startActivity(dungBattle);
+            ;
+        }
+    }
+
 }

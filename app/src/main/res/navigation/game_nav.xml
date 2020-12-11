@@ -9,7 +9,8 @@
         android:id="@+id/forest"
         android:name="com.example.amptown.forest"
         android:label="fragment_forest"
-        tools:layout="@layout/fragment_forest" />
+        tools:layout="@layout/fragment_forest"
+        />
     <fragment
         android:id="@+id/town"
         android:name="com.example.amptown.town"

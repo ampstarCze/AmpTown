@@ -1,12 +1,5 @@
 package com.example.amptown;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,23 +10,29 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class game_main extends AppCompatActivity {
+import java.util.Random;
+
+public class game_main extends FragmentActivity {
 
     private SharedPreferences preferences;
     private SharedPreferences.Editor preferencesEditor;
 
+   public static Fragment currentFragment;
+
     private long dayTime = 600000;
     private long dayTimeLeft = dayTime;
     private CountDownTimer dayTimer;
-    private database db;
+    private static database db;
 
     public MusicPlayer mServ;
     private boolean mIsBound = false;
@@ -41,14 +40,47 @@ public class game_main extends AppCompatActivity {
 
     private int minute = 0;
     private int hour = 0;
-    private int day = 0;
+    public static int day = 0;
 
     private TextView minuteView;
     private TextView hourView;
     private TextView dayView;
 
-    public int ID;
+    public static TextView frameTextL;
+    public static TextView frameTextM;
+    public static TextView frameTextR;
+
+    public static int ID;
     private boolean loadGame;
+
+    public static int woodStorege =0;
+    public static int woodStoregeMax = 200;
+    public static int wood =0;
+    public static int gold =0;
+    public static int stoneStorage =0;
+    public static int stoneStoregeMax = 200;
+    public static int stone =0;
+    public static int woodClickGen = 1;
+    public static int stoneCLickGen = 1;
+
+    private int woodGenRate = 0;
+    private int stoneGenRate = 0;
+
+    static boolean stoneBuilded = false;
+    static boolean woodBuilded = false;
+
+    static long woodTransportLeftStart = 20000;
+    static long stoneTransportLeftStart = 20000;
+    static long woodTransportLeft = woodTransportLeftStart;
+    static long stoneTransportLeft = stoneTransportLeftStart;
+    static private CountDownTimer woodTransportTimer;
+    static private CountDownTimer stoneTransportTimer;
+    static boolean woodTransportProgress = false;
+    static boolean stoneTransportPrograss = false;
+
+    static int dungMaxLvl = 1;
+    public static int banditSpawned = 0;
+    public static int banditNext = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +88,18 @@ public class game_main extends AppCompatActivity {
         setContentView(R.layout.activity_game_main);
 
         BottomNavigationView bottomNavigation =  findViewById(R.id.gameBotomMemu);
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-        NavigationUI.setupWithNavController(bottomNavigation,navHostFragment.getNavController());
+        bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+        bottomNavigation.setSelectedItemId(R.id.town);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment,new town()).commit();
 
         minuteView = findViewById(R.id.minute);
         hourView = findViewById(R.id.hour);
         dayView = findViewById(R.id.day);
+
+        frameTextL = findViewById(R.id.frameTextL);
+        frameTextM = findViewById(R.id.frameTextM);
+        frameTextR = findViewById(R.id.frameTextR);
 
         preferences = getSharedPreferences("AmpTown", Context.MODE_PRIVATE);
         preferencesEditor = preferences.edit();
@@ -106,6 +144,10 @@ public class game_main extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 dayTimeLeft = millisUntilFinished;
                 minute+=10;
+
+                generatResources();
+                updateText();
+
                 if(minute>=60)
                 {
                     minute=0;
@@ -123,18 +165,45 @@ public class game_main extends AppCompatActivity {
                 db.update(ID,"day",day);
                 hourView.setText("Hour: "+ hour);
                 dayView.setText("Day: "+ day);
-             //ToDo Remove
-                Log.d("test", "m "+minute+" h " + hour + " d " + day);
             }
 
             @Override
             public void onFinish() {
-
+                if(day >= banditNext)
+                {
+                    banditSpawned = 1;
+                    db.update(ID,"banditSpawned",banditSpawned);
+                    //TODO raid
+                }
                 dayTimeLeft = dayTime;
                 dayTimer.start();
             }
         }.start();
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
+            switch (item.getItemId())
+            {
+                case R.id.map:
+                    selectedFragment = new map();
+                    break;
+                case R.id.forest:
+                    selectedFragment = new forest();
+                    break;
+                case R.id.town:
+                    selectedFragment = new town();
+                    break;
+                case R.id.mine:
+                    selectedFragment = new mine();
+                    break;
+            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment, selectedFragment).commit();
+            return true;
+        }
+    };
 
     private void loadGame() {
         Cursor cursor = db.getData(ID);
@@ -157,10 +226,16 @@ public class game_main extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+        if (currentFragment instanceof map) {
+            if(map.dungList.getVisibility() == View.VISIBLE) {
+                map.dungList.setVisibility(View.GONE);
+                return;
+            }
+        }
+
         Intent mainMenu = new Intent(getApplicationContext(), MainMenu.class);
         startActivity(mainMenu);
-        dayTimer.cancel();
-        finish();
     }
 
     @Override
@@ -222,6 +297,140 @@ public class game_main extends AppCompatActivity {
         {
             unbindService(Scon);
             mIsBound = false;
+        }
+    }
+
+    static void updateText()
+    {
+        if (currentFragment instanceof forest) {
+            frameTextL.setText("Storaged wood: " + woodStorege + " / "+ woodStoregeMax);
+        }
+
+        if (currentFragment instanceof mine) {
+            frameTextL.setText("Storaged stone: " + stoneStorage + " / "+ stoneStoregeMax);
+        }
+    }
+
+    void generatResources()
+    {
+        woodStorege += woodGenRate;
+        if(woodStorege > woodStoregeMax)
+        {
+            woodStorege = woodStoregeMax;
+        }
+
+        stoneStorage += stoneGenRate;
+        if(stoneStorage > stoneStoregeMax)
+        {
+            stoneStorage = stoneStoregeMax;
+        }
+        db.updateStoraged(ID,woodStorege,stoneStorage);
+    }
+
+    public static void genClick()
+    {
+        if (currentFragment instanceof forest) {
+            woodStorege += woodClickGen;
+            if(woodStorege > woodStoregeMax)
+            {
+                woodStorege = woodStoregeMax;
+            }
+        }
+
+        if (currentFragment instanceof mine) {
+            stoneStorage += stoneCLickGen;
+            if(woodStorege > woodStoregeMax)
+            {
+                woodStorege = woodStoregeMax;
+            }
+        }
+        updateText();
+    }
+
+    public static void initWoodTransport()
+    {
+        if(!woodTransportProgress)
+        {
+            woodTransportProgress = true;
+            forest.forestTransportText.setVisibility(View.VISIBLE);
+            woodTransportTimer = new CountDownTimer( woodTransportLeft, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    woodTransportLeft = millisUntilFinished;
+                    forest.forestTransportText.setText(""+woodTransportLeft/1000);
+                }
+
+                @Override
+                public void onFinish() {
+                    woodTransportLeft = woodTransportLeftStart;
+                    forest.forestTransportText.setVisibility(View.GONE);
+                    if(isRaided()) {
+                        wood += woodStorege;
+                        db.update(ID, "wood", wood);
+                    }
+                    woodStorege = 0;
+                    woodTransportProgress = false;
+                    if (currentFragment instanceof forest) {
+                        frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStoregeMax);
+                    }
+                    if (currentFragment instanceof town) {
+                        frameTextL.setText("Wood: " + wood);
+                        frameTextM.setText("Stone: " + stone);
+                        frameTextR.setText("Gold: " + gold);
+                    }
+                    db.update(ID, "woodStorage", woodStorege);
+                }
+            }.start();
+        }
+    }
+
+    public static void initStoneTransport()
+    {
+        if(!stoneTransportPrograss)
+        {
+            stoneTransportPrograss = true;
+            mine.mineTransportText.setVisibility(View.VISIBLE);
+            stoneTransportTimer = new CountDownTimer( stoneTransportLeft, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    stoneTransportLeft = millisUntilFinished;
+                    mine.mineTransportText.setText(""+stoneTransportLeft/1000);
+                }
+
+                @Override
+                public void onFinish() {
+                    stoneTransportLeft = stoneTransportLeftStart;
+                    mine.mineTransportText.setVisibility(View.GONE);
+                    if(isRaided()) {
+                        stone += stoneStorage;
+                        db.update(ID, "stone", stone);
+                    }
+                    stoneStorage = 0;
+                    if (currentFragment instanceof mine) {
+                        frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
+                    }
+                    stoneTransportPrograss = false;
+                    if (currentFragment instanceof town) {
+                        frameTextL.setText("Wood: " + wood);
+                        frameTextM.setText("Stone: " + stone);
+                        frameTextR.setText("Gold: " + gold);
+                    }
+                    db.update(ID, "stoneStorage", stoneStorage);
+                }
+            }.start();
+        }
+    }
+
+    private static boolean isRaided()
+    {
+        final int random = new Random().nextInt((10 - 1) + 1) + 1;
+        if(random == 1)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 

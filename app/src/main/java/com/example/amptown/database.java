@@ -21,7 +21,8 @@ public class database extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE save (id INTEGER, saveTime NUMERIC, day INTEGER, hour INTEGER, minute INTEGER, wood INTEGER, stone INTEGER, dayTimeLeft INTEGER, gold INTEGER, woodcutterCount INTEGER, axeLVL INTEGER, " +
+        db.execSQL("CREATE TABLE save (id INTEGER, saveTime NUMERIC, day INTEGER, hour INTEGER, minute INTEGER, wood INTEGER, stone INTEGER , gold INTEGER, woodStorage INTEGER, stoneStorage INTEGER, woodStorageMax INTEGER, " +
+                "stoneStorageMax INTEGER, dayTimeLeft INTEGER, woodcutterCount INTEGER, axeLVL INTEGER, " +
                 "stonecutterCount INTEGER, pickaxeLVL INTEGER, marketplaceLVL INTEGER, woodBuy INTEGER, woodSell INTEGER, stoneBuy INTEGER, stoneSell INTEGER, barracksLVL INTEGER, soldiersCount INTEGER," +
                 " swordLVL INTEGER, soldiersDPS INTEGER, dungMax INTEGER, banditSpawned INTEGER, banditNext INTEGER, banditWood INTEGER, banditStone INTEGER, banditGold INTEGER)");
     }
@@ -36,6 +37,7 @@ public class database extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
        // db.execSQL("DROP TABLE save");
+        //onCreate(db);
         db.delete("save","id=?",new String[] {String.valueOf(ID)});
 
         ContentValues contentValues = new ContentValues();
@@ -47,6 +49,10 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("wood", 0);
         contentValues.put("stone", 0);
         contentValues.put("gold", 0);
+        contentValues.put("woodStorage", 0);
+        contentValues.put("stoneStorage", 0);
+        contentValues.put("woodStorageMax", 200);
+        contentValues.put("stoneStorageMax", 200);
         contentValues.put("dayTimeLeft", 600000);
         contentValues.put("woodcutterCount", 0);
         contentValues.put("axeLVL", 0);
@@ -188,6 +194,25 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("stone",stone);
         contentValues.put("gold", gold);
         db.update("price"+ID,contentValues,"name=?",new String[]{name});
+    }
+
+    public void updateStoraged(Integer ID, Integer woodStorage, Integer stoneStorage)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("woodStorage", woodStorage);
+        contentValues.put("stoneStorage",stoneStorage);
+        db.update("save" ,contentValues,"id=?",new String[] {String.valueOf(ID)});
+    }
+
+    public void updateResources(Integer ID, Integer wood, Integer stone, Integer gold)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("wood", wood);
+        contentValues.put("stone",stone);
+        contentValues.put("gold", gold);
+        db.update("save" ,contentValues,"id=?",new String[] {String.valueOf(ID)});
     }
 
     public Cursor getData(int ID){

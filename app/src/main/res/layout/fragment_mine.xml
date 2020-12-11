@@ -33,7 +33,7 @@
             app:layout_constraintVertical_bias="0.8">
 
             <ImageView
-                android:id="@+id/forest_wagon"
+                android:id="@+id/mine_wagon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/wagon"
@@ -43,12 +43,13 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/forest_wagon_text"
+                android:id="@+id/mine_wagon_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="TextView"
                 android:textColor="@color/gold"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
