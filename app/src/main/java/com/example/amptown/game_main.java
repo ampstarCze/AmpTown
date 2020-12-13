@@ -94,6 +94,7 @@ public class game_main extends AppCompatActivity {
 
         BottomNavigationView bottomNavigation = findViewById(R.id.gameBotomMemu);
         bottomNavigation.setOnNavigationItemSelectedListener(navListener);
+        bottomNavigation.setItemIconTintList(null);
         bottomNavigation.setSelectedItemId(R.id.town);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment, new town()).commit();
@@ -138,9 +139,8 @@ public class game_main extends AppCompatActivity {
 
         if (!loadGame) {
             db.newSave(ID);
-        } else {
-            loadGame();
         }
+        loadGame();
 
         dayTimer = new CountDownTimer(dayTimeLeft, 2083) {
             @Override
@@ -205,7 +205,6 @@ public class game_main extends AppCompatActivity {
             return true;
         }
     };
-
 
     private void loadGame() {
         Cursor cursor = db.getData(ID);
