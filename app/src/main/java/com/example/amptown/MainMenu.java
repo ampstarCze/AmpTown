@@ -111,8 +111,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     public void MainMenuExit(View view) {
-        finish();
-        System.exit(0);
+        finishAffinity();
     }
 
     public void mainMenuSettings(View view) {

@@ -57,11 +57,10 @@ public class mine extends Fragment implements View.OnClickListener  {
     public void onClick(View v) {
         if (v.getId() == R.id.pickaxe) {
             if (!game_main.stoneBuilded) {
-                if (game_main.stoneHammerClick < 2) {
-                    game_main.stoneHammerClick++;
+                if (game_main.stoneHammerClick > 1) {
+                    game_main.stoneHammerClick--;
 
                 } else {
-                    game_main.stoneHammerClick = 0;
                     pickAxeButton.setImageResource(R.drawable.pick_axe);
                     game_main.stoneBuilded = true;
                 }

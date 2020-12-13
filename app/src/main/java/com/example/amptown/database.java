@@ -24,7 +24,9 @@ public class database extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE save (id INTEGER, saveTime NUMERIC, day INTEGER, hour INTEGER, minute INTEGER, wood INTEGER, stone INTEGER , gold INTEGER, woodStorage INTEGER, stoneStorage INTEGER, woodStorageMax INTEGER, " +
                 "stoneStorageMax INTEGER, dayTimeLeft INTEGER, woodcutterCount INTEGER, axeLVL INTEGER, " +
                 "stonecutterCount INTEGER, pickaxeLVL INTEGER, marketplaceLVL INTEGER, woodBuy INTEGER, woodSell INTEGER, stoneBuy INTEGER, stoneSell INTEGER, barracksLVL INTEGER, soldiersCount INTEGER," +
-                " swordLVL INTEGER, soldiersDPS INTEGER, dungMax INTEGER, banditSpawned INTEGER, banditNext INTEGER, banditWood INTEGER, banditStone INTEGER, banditGold INTEGER)");
+                " swordLVL INTEGER, soldiersDPS INTEGER, dungMax INTEGER, banditSpawned INTEGER, banditNext INTEGER, banditWood INTEGER, banditStone INTEGER, banditGold INTEGER, woodHammerClick INTEGER, stoneHammerClick INTEGER," +
+                "woodcutterStorageLVL INTEGER, woodcutterSpeedLVL INTEGER, stonecutterStorageLVL INTEGER, stonecutterSpeedLVL INTEGER, woodGenRate INTEGER, stoneGenRate INTEGER, woodClickGen INTEGER, stoneClickGen INTEGER," +
+                "woodcutterLVL INTEGER, stonecutterLVL INTEGER, woodTransportLeftStart INTEGER, stoneTransportLeftStart INTEGER )");
     }
 
     @Override
@@ -36,8 +38,8 @@ public class database extends SQLiteOpenHelper {
     public void newSave(Integer ID)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-       // db.execSQL("DROP TABLE save");
-        //onCreate(db);
+        db.execSQL("DROP TABLE save");
+        onCreate(db);
         db.delete("save","id=?",new String[] {String.valueOf(ID)});
 
         ContentValues contentValues = new ContentValues();
@@ -53,19 +55,19 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("stoneStorage", 0);
         contentValues.put("woodStorageMax", 200);
         contentValues.put("stoneStorageMax", 200);
-        contentValues.put("dayTimeLeft", 600000);
+        contentValues.put("dayTimeLeft", 300000);
         contentValues.put("woodcutterCount", 0);
-        contentValues.put("axeLVL", 0);
+        contentValues.put("axeLVL", 1);
         contentValues.put("stonecutterCount", 0);
-        contentValues.put("pickaxeLVL", 0);
+        contentValues.put("pickaxeLVL", 1);
         contentValues.put("marketplaceLVL", 0);
-        contentValues.put("woodBuy", 0);
-        contentValues.put("woodSell", 0);
-        contentValues.put("stoneBuy", 0);
-        contentValues.put("stoneSell", 0);
+        contentValues.put("woodBuy", 100);
+        contentValues.put("woodSell", 25);
+        contentValues.put("stoneBuy", 120);
+        contentValues.put("stoneSell", 30);
         contentValues.put("barracksLVL", 0);
         contentValues.put("soldiersCount", 0);
-        contentValues.put("swordLVL", 0);
+        contentValues.put("swordLVL", 1);
         contentValues.put("soldiersDPS", 0);
         contentValues.put("dungMax", 0);
         contentValues.put("banditSpawned", 0);
@@ -73,6 +75,20 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("banditWood", 0);
         contentValues.put("banditStone", 0);
         contentValues.put("banditGold", 0);
+        contentValues.put("woodHammerClick", 3);
+        contentValues.put("stoneHammerClick", 3);
+        contentValues.put("woodcutterStorageLVL", 1);
+        contentValues.put("woodcutterSpeedLVL", 1);
+        contentValues.put("stonecutterStorageLVL", 1);
+        contentValues.put("stonecutterSpeedLVL", 1);
+        contentValues.put("woodGenRate", 0);
+        contentValues.put("stoneGenRate", 0);
+        contentValues.put("woodClickGen", 1);
+        contentValues.put("stoneClickGen", 1);
+        contentValues.put("woodcutterLVL", 0);
+        contentValues.put("stonecutterLVL", 0);
+        contentValues.put("woodTransportLeftStart", 20000);
+        contentValues.put("stoneTransportLeftStart", 20000);
 
         db.insert("save", null, contentValues);
 
@@ -218,6 +234,12 @@ public class database extends SQLiteOpenHelper {
     public Cursor getData(int ID){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery("select * from save where id=" + ID + "", null);
+        return res;
+    }
+
+    public Cursor getPrices(int ID){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery("select * from price" + ID, null);
         return res;
     }
 }

@@ -15,21 +15,21 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Random;
 
-public class game_main extends FragmentActivity {
+public class game_main extends AppCompatActivity {
 
     private SharedPreferences preferences;
     private SharedPreferences.Editor preferencesEditor;
 
     public static Fragment currentFragment;
 
-    private long dayTime = 600000;
+    private long dayTime = 300000;
     private long dayTimeLeft = dayTime;
     private CountDownTimer dayTimer;
     public static database db;
@@ -53,18 +53,18 @@ public class game_main extends FragmentActivity {
     public static int ID;
     private boolean loadGame;
 
+    public static int wood = 10000;
+    public static int gold = 10000;
+    public static int stone = 10000;
     public static int woodStorege = 0;
-    public static int woodStoregeMax = 200;
-    public static int wood = 0;
-    public static int gold = 0;
+    public static int woodStorageMax = 200;
     public static int stoneStorage = 0;
     public static int stoneStoregeMax = 200;
-    public static int stone = 0;
     public static int woodClickGen = 1;
-    public static int stoneCLickGen = 1;
+    public static int stoneClickGen = 1;
 
-    private int woodGenRate = 3;
-    private int stoneGenRate = 3;
+    public static int woodGenRate = 0;
+    public static int stoneGenRate = 0;
 
     static boolean stoneBuilded = false;
     static boolean woodBuilded = false;
@@ -142,7 +142,7 @@ public class game_main extends FragmentActivity {
             loadGame();
         }
 
-        dayTimer = new CountDownTimer(dayTimeLeft, 4400) {
+        dayTimer = new CountDownTimer(dayTimeLeft, 2083) {
             @Override
             public void onTick(long millisUntilFinished) {
                 dayTimeLeft = millisUntilFinished;
@@ -173,9 +173,10 @@ public class game_main extends FragmentActivity {
                 if (day >= banditNext) {
                     banditSpawned = 1;
                     db.update(ID, "banditSpawned", banditSpawned);
-                    banditRaid();
-                    damageGen();
                 }
+                banditRaid();
+                damageGen();
+                marketplace.restartPrice();
                 dayTimeLeft = dayTime;
                 dayTimer.start();
             }
@@ -205,6 +206,7 @@ public class game_main extends FragmentActivity {
         }
     };
 
+
     private void loadGame() {
         Cursor cursor = db.getData(ID);
         cursor.moveToFirst();
@@ -232,6 +234,10 @@ public class game_main extends FragmentActivity {
                 return;
             }
         }
+        if (currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment, new town()).addToBackStack(null).commit();
+                return;
+            }
 
         Intent mainMenu = new Intent(getApplicationContext(), MainMenu.class);
         startActivity(mainMenu);
@@ -299,19 +305,24 @@ public class game_main extends FragmentActivity {
 
     static void updateText() {
         if (currentFragment instanceof forest) {
-            frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStoregeMax);
+            frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStorageMax);
         }
 
         if (currentFragment instanceof mine) {
             frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
+        }
+        if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
+            frameTextL.setText("Wood: " + wood);
+            frameTextM.setText("Stone: " + stone);
+            frameTextR.setText("Gold: " + gold);
         }
     }
 
     void generatResources() {
         if(woodBuilded) {
             woodStorege += woodGenRate;
-            if (woodStorege > woodStoregeMax) {
-                woodStorege = woodStoregeMax;
+            if (woodStorege > woodStorageMax) {
+                woodStorege = woodStorageMax;
             }
         }
         if(stoneBuilded) {
@@ -326,15 +337,15 @@ public class game_main extends FragmentActivity {
     public static void genClick() {
         if (currentFragment instanceof forest) {
             woodStorege += woodClickGen;
-            if (woodStorege > woodStoregeMax) {
-                woodStorege = woodStoregeMax;
+            if (woodStorege > woodStorageMax) {
+                woodStorege = woodStorageMax;
             }
         }
 
         if (currentFragment instanceof mine) {
-            stoneStorage += stoneCLickGen;
-            if (woodStorege > woodStoregeMax) {
-                woodStorege = woodStoregeMax;
+            stoneStorage += stoneClickGen;
+            if (woodStorege > woodStorageMax) {
+                woodStorege = woodStorageMax;
             }
         }
         updateText();
@@ -343,6 +354,8 @@ public class game_main extends FragmentActivity {
     public static void initWoodTransport() {
         if (!woodTransportProgress) {
             woodTransportProgress = true;
+            woodTransportLeft = woodTransportLeftStart;
+            forest.forestTransportText.setText("" + woodTransportLeft / 1000);
             forest.forestTransportText.setVisibility(View.VISIBLE);
             woodTransportTimer = new CountDownTimer(woodTransportLeft, 1000) {
                 @Override
@@ -362,9 +375,9 @@ public class game_main extends FragmentActivity {
                     woodStorege = 0;
                     woodTransportProgress = false;
                     if (currentFragment instanceof forest) {
-                        frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStoregeMax);
+                        frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStorageMax);
                     }
-                    if (currentFragment instanceof town) {
+                    if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
                         frameTextL.setText("Wood: " + wood);
                         frameTextM.setText("Stone: " + stone);
                         frameTextR.setText("Gold: " + gold);
@@ -377,6 +390,7 @@ public class game_main extends FragmentActivity {
 
     public static void initStoneTransport() {
         if (!stoneTransportPrograss) {
+            stoneTransportLeft = stoneTransportLeftStart;
             stoneTransportPrograss = true;
             mine.mineTransportText.setVisibility(View.VISIBLE);
             stoneTransportTimer = new CountDownTimer(stoneTransportLeft, 1000) {
@@ -399,7 +413,7 @@ public class game_main extends FragmentActivity {
                         frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
                     }
                     stoneTransportPrograss = false;
-                    if (currentFragment instanceof town) {
+                    if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
                         frameTextL.setText("Wood: " + wood);
                         frameTextM.setText("Stone: " + stone);
                         frameTextR.setText("Gold: " + gold);
@@ -446,7 +460,7 @@ public class game_main extends FragmentActivity {
                 gold = 0;
             }
 
-            if (currentFragment instanceof town) {
+            if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
                 frameTextL.setText("Wood: " + wood);
                 frameTextM.setText("Stone: " + stone);
                 frameTextR.setText("Gold: " + gold);

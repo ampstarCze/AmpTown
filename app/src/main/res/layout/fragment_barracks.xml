@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".town">
+    tools:context=".barracks">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,8 +23,107 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.56">
 
+            <Button
+                android:id="@+id/btnBarracksSoldier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                android:text="Hire"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.80"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.38" />
+
+            <Button
+                android:id="@+id/btnBarracksSword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                android:text="Upgrade"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.80"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.835" />
+
+            <Button
+                android:id="@+id/barracksBuild"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background"
+                android:text="Build"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.498" />
+
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/barracksBuildPrice"
+                android:layout_width="284dp"
+                android:layout_height="49dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:shadowColor="#000000"
+                android:shadowDx="3.6"
+                android:shadowDy="2.1"
+                android:shadowRadius="1.9"
+                android:text="Wood: 2500 Stone: 2500 Gold: 250"
+                android:textColor="@color/gold"
+                android:textSize="18sp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.298" />
+
+            <TextView
+                android:id="@+id/barracksSoldierText"
+                android:layout_width="221dp"
+                android:layout_height="49dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:shadowColor="#000000"
+                android:shadowDx="3.6"
+                android:shadowDy="2.1"
+                android:shadowRadius="1.9"
+                android:text="Soldier"
+                android:textColor="@color/gold"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.506"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.212" />
+
+            <TextView
+                android:id="@+id/barracksSwordText"
+                android:layout_width="221dp"
+                android:layout_height="49dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:shadowColor="#000000"
+                android:shadowDx="3.6"
+                android:shadowDy="2.1"
+                android:shadowRadius="1.9"
+                android:text="Sword"
+                android:textColor="@color/gold"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.6" />
+
+            <TextView
+                android:id="@+id/textView12"
                 android:layout_width="156dp"
                 android:layout_height="45dp"
                 android:gravity="center_horizontal|center_vertical"
@@ -32,7 +131,7 @@
                 android:shadowDx="3.6"
                 android:shadowDy="2.1"
                 android:shadowRadius="1.9"
-                android:text="Town"
+                android:text="Barracks"
                 android:textColor="@color/gold"
                 android:textSize="24sp"
                 android:visibility="visible"
@@ -44,134 +143,44 @@
                 app:layout_constraintVertical_bias="0.044" />
 
             <TextView
-                android:id="@+id/textView6"
-                android:layout_width="156dp"
-                android:layout_height="45dp"
-                android:gravity="center_horizontal|center_vertical"
+                android:id="@+id/barracksSoldierPrice"
+                android:layout_width="125dp"
+                android:layout_height="113dp"
                 android:shadowColor="#000000"
                 android:shadowDx="3.6"
                 android:shadowDy="2.1"
                 android:shadowRadius="1.9"
-                android:text="Sawmill"
+                android:text="Soldier"
                 android:textColor="@color/gold"
-                android:textSize="24sp"
+                android:textSize="18sp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.144"
+                app:layout_constraintHorizontal_bias="0.25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.197" />
-
-            <Button
-                android:id="@+id/townMarketplace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
-                android:text="Enter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.863"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.654" />
-
-            <Button
-                android:id="@+id/townBarracks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
-                android:text="Enter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.863"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.897" />
-
-            <Button
-                android:id="@+id/townWoodcutter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
-                android:text="Enter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.863"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.199" />
-
-            <Button
-                android:id="@+id/townStonemason"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_background"
-                android:text="Enter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.863"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.426" />
+                app:layout_constraintVertical_bias="0.37" />
 
             <TextView
-                android:id="@+id/textView8"
-                android:layout_width="156dp"
-                android:layout_height="45dp"
-                android:gravity="center_horizontal|center_vertical"
+                android:id="@+id/barracksSwordPrice"
+                android:layout_width="125dp"
+                android:layout_height="113dp"
                 android:shadowColor="#000000"
                 android:shadowDx="3.6"
                 android:shadowDy="2.1"
                 android:shadowRadius="1.9"
-                android:text="Marketplace"
+                android:text="Sword"
                 android:textColor="@color/gold"
-                android:textSize="24sp"
+                android:textSize="18sp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.144"
+                app:layout_constraintHorizontal_bias="0.25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.654" />
-
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="156dp"
-                android:layout_height="45dp"
-                android:gravity="center_horizontal|center_vertical"
-                android:shadowColor="#000000"
-                android:shadowDx="3.6"
-                android:shadowDy="2.1"
-                android:shadowRadius="1.9"
-                android:text="Barracks"
-                android:textColor="@color/gold"
-                android:textSize="24sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.144"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.895" />
-
-            <TextView
-                android:id="@+id/textView7"
-                android:layout_width="156dp"
-                android:layout_height="45dp"
-                android:gravity="center_horizontal|center_vertical"
-                android:shadowColor="#000000"
-                android:shadowDx="3.6"
-                android:shadowDy="2.1"
-                android:shadowRadius="1.9"
-                android:text="Stonemasonry"
-                android:textColor="@color/gold"
-                android:textSize="24sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.144"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.428" />
+                app:layout_constraintVertical_bias="0.885" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </FrameLayout>

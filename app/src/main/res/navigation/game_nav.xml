@@ -26,5 +26,25 @@
         android:name="com.example.amptown.map"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" />
+    <fragment
+        android:id="@+id/woodcutter"
+        android:name="com.example.amptown.woodcutter"
+        android:label="fragment_woodcutter"
+        tools:layout="@layout/fragment_woodcutter" />
+    <fragment
+        android:id="@+id/stonecutter"
+        android:name="com.example.amptown.stonecutter"
+        android:label="fragment_stonecutter"
+        tools:layout="@layout/fragment_stonecutter" />
+    <fragment
+        android:id="@+id/marketplace"
+        android:name="com.example.amptown.marketplace"
+        android:label="fragment_marketplace"
+        tools:layout="@layout/fragment_marketplace" />
+    <fragment
+        android:id="@+id/barracks"
+        android:name="com.example.amptown.barracks"
+        android:label="fragment_barracks"
+        tools:layout="@layout/fragment_barracks" />
 
 </navigation>

@@ -29,7 +29,7 @@ public class forest extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_forest, container, false);
 
-        game_main.frameTextL.setText("Storaged wood: " + game_main.woodStorege + " / " + game_main.woodStoregeMax);
+        game_main.frameTextL.setText("Storaged wood: " + game_main.woodStorege + " / " + game_main.woodStorageMax);
         game_main.frameTextL.setVisibility(View.VISIBLE);
         game_main.frameTextM.setVisibility(View.GONE);
         game_main.frameTextR.setVisibility(View.GONE);
@@ -59,10 +59,9 @@ public class forest extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.axe) {
             if (!game_main.woodBuilded) {
-                if (game_main.woodHammerClick < 2) {
-                    game_main.woodHammerClick++;
+                if (game_main.woodHammerClick > 1) {
+                    game_main.woodHammerClick--;
                 } else {
-                    game_main.woodHammerClick = 0;
                     axeButton.setImageResource(R.drawable.axe);
                     game_main.woodBuilded = true;
                 }

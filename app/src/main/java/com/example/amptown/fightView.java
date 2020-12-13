@@ -92,8 +92,12 @@ public class fightView extends SurfaceView implements SurfaceHolder.Callback, Vi
         }
         DPS = cursor.getInt(cursor.getColumnIndex("soldiersDPS"));
         int swordLVL = cursor.getInt(cursor.getColumnIndex("swordLVL"));
-        for (int i = 1; i <= swordLVL; i++) {
+        for (int i = 1; i <= swordLVL-1; i++) {
             damageClick *= 2;
+        }
+
+        if (!cursor.isClosed()) {
+            cursor.close();
         }
 
         fightLoop = new fightLoop(this, surfaceHolder);
