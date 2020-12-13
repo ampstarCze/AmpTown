@@ -69,7 +69,7 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("soldiersCount", 0);
         contentValues.put("swordLVL", 1);
         contentValues.put("soldiersDPS", 0);
-        contentValues.put("dungMax", 0);
+        contentValues.put("dungMax", 1);
         contentValues.put("banditSpawned", 0);
         contentValues.put("banditNext", 3);
         contentValues.put("banditWood", 0);
