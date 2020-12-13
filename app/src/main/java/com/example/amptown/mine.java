@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,7 +29,7 @@ public class mine extends Fragment implements View.OnClickListener  {
 
         game_main.currentFragment = getFragmentManager().findFragmentById(R.id.fragment);
 
-        game_main.frameTextL.setText("Storaged stone: " + game_main.stoneStorage + " / "+ game_main.stoneStoregeMax);
+        game_main.frameTextL.setText("Storaged stone: " + game_main.stoneStorage + " / "+ game_main.stoneStorageMax);
         game_main.frameTextL.setVisibility(View.VISIBLE);
         game_main.frameTextM.setVisibility(View.GONE);
         game_main.frameTextR.setVisibility(View.GONE);

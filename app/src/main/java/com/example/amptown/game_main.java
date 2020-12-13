@@ -59,7 +59,7 @@ public class game_main extends AppCompatActivity {
     public static int woodStorege = 0;
     public static int woodStorageMax = 200;
     public static int stoneStorage = 0;
-    public static int stoneStoregeMax = 200;
+    public static int stoneStorageMax = 200;
     public static int woodClickGen = 1;
     public static int stoneClickGen = 1;
 
@@ -309,7 +309,7 @@ public class game_main extends AppCompatActivity {
         }
 
         if (currentFragment instanceof mine) {
-            frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
+            frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStorageMax);
         }
         if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
             frameTextL.setText("Wood: " + wood);
@@ -327,8 +327,8 @@ public class game_main extends AppCompatActivity {
         }
         if(stoneBuilded) {
             stoneStorage += stoneGenRate;
-            if (stoneStorage > stoneStoregeMax) {
-                stoneStorage = stoneStoregeMax;
+            if (stoneStorage > stoneStorageMax) {
+                stoneStorage = stoneStorageMax;
             }
         }
         db.updateStoraged(ID, woodStorege, stoneStorage);
@@ -340,13 +340,15 @@ public class game_main extends AppCompatActivity {
             if (woodStorege > woodStorageMax) {
                 woodStorege = woodStorageMax;
             }
+            db.update(ID, "woodStorage", woodStorege);
         }
 
         if (currentFragment instanceof mine) {
             stoneStorage += stoneClickGen;
-            if (woodStorege > woodStorageMax) {
-                woodStorege = woodStorageMax;
+            if (stoneStorage > stoneStorageMax) {
+                stoneStorage = stoneStorageMax;
             }
+            db.update(ID, "stoneStorage", stoneStorage);
         }
         updateText();
     }
@@ -392,6 +394,7 @@ public class game_main extends AppCompatActivity {
         if (!stoneTransportPrograss) {
             stoneTransportLeft = stoneTransportLeftStart;
             stoneTransportPrograss = true;
+            mine.mineTransportText.setText("" + stoneTransportLeft / 1000);
             mine.mineTransportText.setVisibility(View.VISIBLE);
             stoneTransportTimer = new CountDownTimer(stoneTransportLeft, 1000) {
                 @Override
@@ -410,7 +413,7 @@ public class game_main extends AppCompatActivity {
                     }
                     stoneStorage = 0;
                     if (currentFragment instanceof mine) {
-                        frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStoregeMax);
+                        frameTextL.setText("Storaged stone: " + stoneStorage + " / " + stoneStorageMax);
                     }
                     stoneTransportPrograss = false;
                     if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {

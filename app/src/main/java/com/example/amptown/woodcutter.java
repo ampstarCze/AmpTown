@@ -132,8 +132,14 @@ public class woodcutter extends Fragment implements View.OnClickListener {
         sawmillStorageText.setText("Storage LVL: " + woodcutterStorageLVL);
         sawmillStoragePrice.setText("Wood: " + woodcutterStorageWood + "\nStone: " + woodcutterStorageStone + "\nGold: " + woodcutterStorageGold);
 
-        sawmillSpeedText.setText("Transport speed LVL: " + woodcutterSpeedLVL);
-        sawmillSpeedPrice.setText("Wood: " + woodcutterSpeedWood + "\nStone: " + woodcutterSpeedStone + "\nGold: " + woodcutterSpeedGold);
+        if (woodcutterSpeedLVL <= 4) {
+            sawmillSpeedText.setText("Transport speed LVL: " + woodcutterSpeedLVL);
+            sawmillSpeedPrice.setText("Wood: " + woodcutterSpeedWood + "\nStone: " + woodcutterSpeedStone + "\nGold: " + woodcutterSpeedGold);
+        } else {
+            sawmillSpeedText.setText("Transport speed LVL: " + woodcutterSpeedLVL);
+            sawmillSpeedPrice.setText("MAX LVL");
+            btnSawmillSpeed.setVisibility(View.GONE);
+        }
 
         btnSawmillAxe.setOnClickListener(this);
         btnSawmillBuild.setOnClickListener(this);
@@ -176,95 +182,86 @@ public class woodcutter extends Fragment implements View.OnClickListener {
             }
         }
         if (v.getId() == R.id.btnSawmillLumberjack) {
-            if(game_main.wood >= woodcutterLumberjackWood && game_main.stone>=woodcutterLumberjackStone)
-            {
-                game_main.wood -=woodcutterLumberjackWood;
-                game_main.stone -=woodcutterLumberjackStone;
+            if (game_main.wood >= woodcutterLumberjackWood && game_main.stone >= woodcutterLumberjackStone) {
+                game_main.wood -= woodcutterLumberjackWood;
+                game_main.stone -= woodcutterLumberjackStone;
                 woodcutterCount++;
-                if(game_main.woodGenRate == 0)
-                {
+                if (game_main.woodGenRate == 0) {
                     game_main.woodGenRate = 1;
-                }
-                else {
+                } else {
                     game_main.woodGenRate *= 2;
                 }
                 woodcutterLumberjackWood += (0.8 * woodcutterLumberjackWood);
                 woodcutterLumberjackStone += (0.8 * woodcutterLumberjackStone);
                 game_main.db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
-                game_main.db.updatePrice("woodGen",game_main.ID,woodcutterLumberjackWood,woodcutterLumberjackStone,0);
-                game_main.db.update(game_main.ID,"woodcutterCount",woodcutterCount );
-                game_main.db.update(game_main.ID,"woodGenRate",game_main.woodGenRate);
+                game_main.db.updatePrice("woodGen", game_main.ID, woodcutterLumberjackWood, woodcutterLumberjackStone, 0);
+                game_main.db.update(game_main.ID, "woodcutterCount", woodcutterCount);
+                game_main.db.update(game_main.ID, "woodGenRate", game_main.woodGenRate);
                 sawmillLumberjackText.setText("Lumberjacks count: " + woodcutterCount);
                 sawmillLumberjackPrice.setText("Wood: " + woodcutterLumberjackWood + "\nStone: " + woodcutterLumberjackStone);
                 game_main.updateText();
             }
         }
         if (v.getId() == R.id.btnSawmillAxe) {
-            if(game_main.wood >= woodcutterAxeWood && game_main.stone>=woodcutterAxeStone)
-            {
-                game_main.wood -=woodcutterAxeWood;
-                game_main.stone -=woodcutterAxeStone;
+            if (game_main.wood >= woodcutterAxeWood && game_main.stone >= woodcutterAxeStone) {
+                game_main.wood -= woodcutterAxeWood;
+                game_main.stone -= woodcutterAxeStone;
                 woodcutterAxeLVL++;
                 game_main.woodClickGen *= 2;
                 woodcutterAxeWood += (0.8 * woodcutterAxeWood);
                 woodcutterAxeStone += (0.8 * woodcutterAxeStone);
                 game_main.db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
-                game_main.db.updatePrice("woodClick",game_main.ID,woodcutterAxeWood,woodcutterAxeStone,0);
-                game_main.db.update(game_main.ID,"axeLVL",woodcutterAxeLVL );
-                game_main.db.update(game_main.ID,"woodClickGen",game_main.woodClickGen);
+                game_main.db.updatePrice("woodClick", game_main.ID, woodcutterAxeWood, woodcutterAxeStone, 0);
+                game_main.db.update(game_main.ID, "axeLVL", woodcutterAxeLVL);
+                game_main.db.update(game_main.ID, "woodClickGen", game_main.woodClickGen);
                 sawmillAxeText.setText("Axe LVL: " + woodcutterAxeLVL);
                 sawmillAxePrice.setText("Wood: " + woodcutterAxeWood + "\nStone: " + woodcutterAxeStone);
                 game_main.updateText();
             }
         }
         if (v.getId() == R.id.btnSawmillStorage) {
-            if(game_main.wood >= woodcutterStorageWood && game_main.stone>=woodcutterStorageStone && game_main.gold>=woodcutterStorageGold)
-            {
-                game_main.wood -=woodcutterStorageWood;
-                game_main.stone -=woodcutterStorageStone;
-                game_main.gold -=woodcutterStorageGold;
+            if (game_main.wood >= woodcutterStorageWood && game_main.stone >= woodcutterStorageStone && game_main.gold >= woodcutterStorageGold) {
+                game_main.wood -= woodcutterStorageWood;
+                game_main.stone -= woodcutterStorageStone;
+                game_main.gold -= woodcutterStorageGold;
                 woodcutterStorageLVL++;
                 game_main.woodStorageMax *= 2;
                 woodcutterStorageWood += (0.9 * woodcutterStorageWood);
                 woodcutterStorageStone += (0.95 * woodcutterStorageStone);
                 woodcutterStorageGold += (0.7 * woodcutterStorageGold);
                 game_main.db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
-                game_main.db.updatePrice("woodStorage",game_main.ID,woodcutterStorageWood,woodcutterStorageStone,woodcutterStorageGold);
-                game_main.db.update(game_main.ID,"woodcutterStorageLVL",woodcutterStorageLVL );
-                game_main.db.update(game_main.ID,"woodStorageMax",game_main.woodStorageMax);
+                game_main.db.updatePrice("woodStorage", game_main.ID, woodcutterStorageWood, woodcutterStorageStone, woodcutterStorageGold);
+                game_main.db.update(game_main.ID, "woodcutterStorageLVL", woodcutterStorageLVL);
+                game_main.db.update(game_main.ID, "woodStorageMax", game_main.woodStorageMax);
                 sawmillStorageText.setText("Storage LVL: " + woodcutterStorageLVL);
                 sawmillStoragePrice.setText("Wood: " + woodcutterStorageWood + "\nStone: " + woodcutterStorageStone + "\nGold: " + woodcutterStorageGold);
                 game_main.updateText();
             }
         }
         if (v.getId() == R.id.btnSawmillSpeed) {
-            if(woodcutterSpeedLVL <= 4)
-            {
-                if(game_main.wood >= woodcutterSpeedWood && game_main.stone>=woodcutterSpeedStone && game_main.gold>=woodcutterSpeedGold)
-                {
-                    game_main.wood -=woodcutterSpeedWood;
-                    game_main.stone -=woodcutterSpeedStone;
-                    game_main.gold -=woodcutterSpeedGold;
+            if (woodcutterSpeedLVL <= 4) {
+                if (game_main.wood >= woodcutterSpeedWood && game_main.stone >= woodcutterSpeedStone && game_main.gold >= woodcutterSpeedGold) {
+                    game_main.wood -= woodcutterSpeedWood;
+                    game_main.stone -= woodcutterSpeedStone;
+                    game_main.gold -= woodcutterSpeedGold;
                     woodcutterSpeedLVL++;
-                    game_main.woodTransportLeftStart -=5000;
+                    game_main.woodTransportLeftStart -= 5000;
                     woodcutterSpeedWood += (0.8 * woodcutterSpeedWood);
                     woodcutterSpeedStone += (0.9 * woodcutterSpeedStone);
                     woodcutterSpeedGold += (0.75 * woodcutterSpeedGold);
                     game_main.db.updateResources(game_main.ID, game_main.wood, game_main.stone, game_main.gold);
-                    game_main.db.updatePrice("woodSpeed",game_main.ID,woodcutterSpeedWood,woodcutterSpeedStone,woodcutterSpeedGold);
-                    game_main.db.update(game_main.ID,"woodcutterSpeedLVL",woodcutterSpeedLVL );
-                    game_main.db.update(game_main.ID,"woodTransportLeftStart",game_main.woodTransportLeftStart);
+                    game_main.db.updatePrice("woodSpeed", game_main.ID, woodcutterSpeedWood, woodcutterSpeedStone, woodcutterSpeedGold);
+                    game_main.db.update(game_main.ID, "woodcutterSpeedLVL", woodcutterSpeedLVL);
+                    game_main.db.update(game_main.ID, "woodTransportLeftStart", game_main.woodTransportLeftStart);
                     sawmillSpeedText.setText("Transport speed LVL: " + woodcutterSpeedLVL);
                     sawmillSpeedPrice.setText("Wood: " + woodcutterSpeedWood + "\nStone: " + woodcutterSpeedStone + "\nGold: " + woodcutterSpeedGold);
                     game_main.updateText();
                 }
-            }
-            else
-            {
+            } else {
                 sawmillSpeedText.setText("Transport speed LVL: " + woodcutterSpeedLVL);
                 sawmillSpeedPrice.setText("MAX LVL");
                 btnSawmillSpeed.setVisibility(View.GONE);
-        }
+            }
         }
     }
 }
