@@ -53,10 +53,10 @@ public class game_main extends AppCompatActivity {
     public static int ID;
     private boolean loadGame;
 
-    public static int wood = 10000;
-    public static int gold = 10000;
-    public static int stone = 10000;
-    public static int woodStorege = 0;
+    public static int wood = 0;
+    public static int gold = 0;
+    public static int stone = 0;
+    public static int woodStorage = 0;
     public static int woodStorageMax = 200;
     public static int stoneStorage = 0;
     public static int stoneStorageMax = 200;
@@ -214,7 +214,29 @@ public class game_main extends AppCompatActivity {
         day = cursor.getInt(cursor.getColumnIndex("day"));
         hour = cursor.getInt(cursor.getColumnIndex("hour"));
         minute = cursor.getInt(cursor.getColumnIndex("minute"));
+
+        wood = cursor.getInt(cursor.getColumnIndex("wood"));
+        stone = cursor.getInt(cursor.getColumnIndex("stone"));
+        gold = cursor.getInt(cursor.getColumnIndex("gold"));
+        woodStorage = cursor.getInt(cursor.getColumnIndex("woodStorage"));
+        stoneStorage = cursor.getInt(cursor.getColumnIndex("stoneStorage"));
+        woodStorageMax = cursor.getInt(cursor.getColumnIndex("woodStorageMax"));
+        stoneStorageMax = cursor.getInt(cursor.getColumnIndex("stoneStorageMax"));
         dayTimeLeft = cursor.getInt(cursor.getColumnIndex("dayTimeLeft"));
+        dungMaxLvl = cursor.getInt(cursor.getColumnIndex("dungMax"));
+        banditSpawned = cursor.getInt(cursor.getColumnIndex("banditSpawned"));
+        banditNext = cursor.getInt(cursor.getColumnIndex("banditNext"));
+        banditWood = cursor.getInt(cursor.getColumnIndex("banditWood"));
+        banditStone = cursor.getInt(cursor.getColumnIndex("banditStone"));
+        banditGold = cursor.getInt(cursor.getColumnIndex("banditGold"));
+        woodHammerClick = cursor.getInt(cursor.getColumnIndex("woodHammerClick"));
+        stoneHammerClick = cursor.getInt(cursor.getColumnIndex("stoneHammerClick"));
+        woodGenRate = cursor.getInt(cursor.getColumnIndex("woodGenRate"));
+        stoneGenRate = cursor.getInt(cursor.getColumnIndex("stoneGenRate"));
+        woodClickGen = cursor.getInt(cursor.getColumnIndex("woodClickGen"));
+        stoneClickGen = cursor.getInt(cursor.getColumnIndex("stoneClickGen"));
+        woodTransportLeftStart = cursor.getInt(cursor.getColumnIndex("woodTransportLeftStart"));
+        stoneTransportLeftStart = cursor.getInt(cursor.getColumnIndex("stoneTransportLeftStart"));
 
         minuteView.setText("Minute: " + minute);
         hourView.setText("Hour: " + hour);
@@ -305,7 +327,7 @@ public class game_main extends AppCompatActivity {
 
     static void updateText() {
         if (currentFragment instanceof forest) {
-            frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStorageMax);
+            frameTextL.setText("Storaged wood: " + woodStorage + " / " + woodStorageMax);
         }
 
         if (currentFragment instanceof mine) {
@@ -320,9 +342,9 @@ public class game_main extends AppCompatActivity {
 
     void generatResources() {
         if(woodBuilded) {
-            woodStorege += woodGenRate;
-            if (woodStorege > woodStorageMax) {
-                woodStorege = woodStorageMax;
+            woodStorage += woodGenRate;
+            if (woodStorage > woodStorageMax) {
+                woodStorage = woodStorageMax;
             }
         }
         if(stoneBuilded) {
@@ -331,16 +353,16 @@ public class game_main extends AppCompatActivity {
                 stoneStorage = stoneStorageMax;
             }
         }
-        db.updateStoraged(ID, woodStorege, stoneStorage);
+        db.updateStoraged(ID, woodStorage, stoneStorage);
     }
 
     public static void genClick() {
         if (currentFragment instanceof forest) {
-            woodStorege += woodClickGen;
-            if (woodStorege > woodStorageMax) {
-                woodStorege = woodStorageMax;
+            woodStorage += woodClickGen;
+            if (woodStorage > woodStorageMax) {
+                woodStorage = woodStorageMax;
             }
-            db.update(ID, "woodStorage", woodStorege);
+            db.update(ID, "woodStorage", woodStorage);
         }
 
         if (currentFragment instanceof mine) {
@@ -371,20 +393,20 @@ public class game_main extends AppCompatActivity {
                     woodTransportLeft = woodTransportLeftStart;
                     forest.forestTransportText.setVisibility(View.GONE);
                     if (isRaided()) {
-                        wood += woodStorege;
+                        wood += woodStorage;
                         db.update(ID, "wood", wood);
                     }
-                    woodStorege = 0;
+                    woodStorage = 0;
                     woodTransportProgress = false;
                     if (currentFragment instanceof forest) {
-                        frameTextL.setText("Storaged wood: " + woodStorege + " / " + woodStorageMax);
+                        frameTextL.setText("Storaged wood: " + woodStorage + " / " + woodStorageMax);
                     }
                     if (currentFragment instanceof town || currentFragment instanceof woodcutter || currentFragment instanceof stonecutter || currentFragment instanceof barracks || currentFragment instanceof marketplace) {
                         frameTextL.setText("Wood: " + wood);
                         frameTextM.setText("Stone: " + stone);
                         frameTextR.setText("Gold: " + gold);
                     }
-                    db.update(ID, "woodStorage", woodStorege);
+                    db.update(ID, "woodStorage", woodStorage);
                 }
             }.start();
         }
@@ -438,8 +460,6 @@ public class game_main extends AppCompatActivity {
 
     private void banditRaid() {
         if (banditSpawned == 1) {
-
-            final int random = new Random().nextInt((10 - 1) + 1) + 1;
 
             int looted;
             looted = (int) (wood * 0.25);

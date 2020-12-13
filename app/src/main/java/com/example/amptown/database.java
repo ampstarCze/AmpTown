@@ -38,8 +38,8 @@ public class database extends SQLiteOpenHelper {
     public void newSave(Integer ID)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DROP TABLE save");
-        onCreate(db);
+       // db.execSQL("DROP TABLE save");
+       // onCreate(db);
         db.delete("save","id=?",new String[] {String.valueOf(ID)});
 
         ContentValues contentValues = new ContentValues();
@@ -71,7 +71,7 @@ public class database extends SQLiteOpenHelper {
         contentValues.put("soldiersDPS", 0);
         contentValues.put("dungMax", 0);
         contentValues.put("banditSpawned", 0);
-        contentValues.put("banditNext", 0);
+        contentValues.put("banditNext", 3);
         contentValues.put("banditWood", 0);
         contentValues.put("banditStone", 0);
         contentValues.put("banditGold", 0);

@@ -29,7 +29,7 @@ public class forest extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_forest, container, false);
 
-        game_main.frameTextL.setText("Storaged wood: " + game_main.woodStorege + " / " + game_main.woodStorageMax);
+        game_main.frameTextL.setText("Storaged wood: " + game_main.woodStorage + " / " + game_main.woodStorageMax);
         game_main.frameTextL.setVisibility(View.VISIBLE);
         game_main.frameTextM.setVisibility(View.GONE);
         game_main.frameTextR.setVisibility(View.GONE);
